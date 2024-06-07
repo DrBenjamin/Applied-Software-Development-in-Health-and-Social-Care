@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 *.DS_Store
+__pycache__/*
+4_Shiny/__pycache__/app.cpython-312.pyc
