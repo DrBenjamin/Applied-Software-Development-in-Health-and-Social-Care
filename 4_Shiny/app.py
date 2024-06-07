@@ -1,15 +1,13 @@
-from pathlib import Path
-
 import pandas
 from shiny import App, render, ui, reactive
+from pathlib import Path
 from matplotlib import pyplot as plt
 
 app_ui = ui.page_fluid(
-    ui.input_slider("which_year", "Select Year", min= 2012, max=2021,value=2012, step=1, sep=""),
+    ui.input_slider("which_year", "Select Year", min= 2012, max=2021, value=2012, step=1, sep=""),
     ui.output_plot("some_graph"),
     ui.output_table("some_table"),
 )
-
 
 def server(input, output, session):
     # helper function where we load the file
@@ -18,7 +16,6 @@ def server(input, output, session):
         infile = Path(__file__).parent / "deaths_years_places.csv"
         df = pandas.read_csv(infile)
         return df
-
     
     @output
     @render.plot
@@ -46,8 +43,6 @@ def server(input, output, session):
         plt.xlabel("Death Causes") 
         plt.ylabel("Deaths Count") 
         return plt.bar(grouped.index, grouped.NumberofDeaths, color = bar_colors)
-
-
 
     # a bit random example of a table
     @output
