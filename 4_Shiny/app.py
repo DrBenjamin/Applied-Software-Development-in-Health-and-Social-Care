@@ -3,12 +3,11 @@ from shiny import App, render, ui, reactive
 from pathlib import Path
 from matplotlib import pyplot as plt
 
-app_ui = ui.page_sidebar(
-    ui.sidebar(
+app_ui = ui.page_fluid(
+    ui.layout_columns(
         ui.input_selectize("which_area", "Select Area(s)", choices=["NHS Ayrshire and Arran", "NHS Dumfries and Galloway", "NHS Forth Valley", "NHS Grampian", "NHS Grampian", "NHS Highland", "NHS Lothian", "NHS Orkney", "NHS Shetland", "NHS Western Isles", "NHS Fife", "NHS Tayside", "NHS Greater Glasgow and Clyde", "NHS Lanarkshire", ""], multiple=True, selected=["NHS Lothian"]),
         ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep=""),
-    ),
-    ui.card(
+        #ui.output_text("some_text", "Deaths in Scotland by Area and Year"),
         ui.output_plot("some_graph"),
                 ui.output_table("some_table"),
     ),
