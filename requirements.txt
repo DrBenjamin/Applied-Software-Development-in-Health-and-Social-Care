@@ -1,3 +1,4 @@
 jupyter
 shiny
 shinywidgets
+shinyswatch
