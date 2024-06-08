@@ -74,7 +74,6 @@ def server(input, output, session):
             image = 'Maps/' + nhs_areas[nhs_areas.index(area)].replace(" ", "_") + '.png'
             file = here / image
             img_overlay = Image.open(file)
-            img_overlay.load()  # required for png.split()
             map.paste(img_overlay, box=(0, 0), mask=img_overlay.split()[3]) # 3 is the alpha channel
         image = "Maps/Map_.png"
         file = here / image
@@ -86,7 +85,7 @@ def server(input, output, session):
     @output
     @render.table
     def show_table():
-        deaths = pandas.DataFrame( get_data() )
+        deaths = pandas.DataFrame(get_data())
         
         # Choosing the data to be displayed
         areas_to_keep = input.which_area()
