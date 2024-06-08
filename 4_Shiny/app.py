@@ -9,14 +9,12 @@ here = Path(__file__).parent
 nhs_areas = ["NHS Ayreshire and Arran", "NHS Borders", "NHS Dumfries and Galloway", "NHS Fife", "NHS Forth Valley", "NHS Grampian", "NHS Greater Glasgow and Clyde", "NHS Highland", "NHS Lanarkshire", "NHS Lothian", "NHS Orkney", "NHS Shetland", "NHS Tayside", "NHS Western Isles"]
 
 app_ui = ui.page_fluid(
-    ui.layout_columns(
-        ui.h1("Deaths in Scotland"),
-        ui.input_selectize("which_area", "Select Area(s)", choices=nhs_areas, multiple=True),
-        ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep=""),
-        ui.output_plot("show_graph"),
-        ui.output_image("show_image"),
-        ui.output_table("show_table"),
-    ),
+    ui.h1("Deaths in Scotland"),
+    ui.input_selectize("which_area", "Select Area(s)", choices=nhs_areas, multiple=True),
+    ui.output_image("show_image", height="100%"),
+    ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep="", width="100%"),
+    ui.output_plot("show_graph", width="100%"),
+    ui.output_table("show_table", width="100%"),
 )
 
 def server(input, output, session):
