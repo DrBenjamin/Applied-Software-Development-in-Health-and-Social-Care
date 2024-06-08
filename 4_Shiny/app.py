@@ -9,14 +9,14 @@ app_ui = ui.page_fluid(
         ui.input_selectize("which_area", "Select Area(s)", choices=["NHS Ayrshire and Arran", "NHS Dumfries and Galloway", "NHS Forth Valley", "NHS Grampian", "NHS Grampian", "NHS Highland", "NHS Lothian", "NHS Orkney", "NHS Shetland", "NHS Western Isles", "NHS Fife", "NHS Tayside", "NHS Greater Glasgow and Clyde", "NHS Lanarkshire", ""], multiple=True, selected=["NHS Lothian"]),
         ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep=""),
         ui.output_plot("some_graph"),
-                ui.output_table("some_table"),
+        ui.output_table("some_table"),
     ),
 )
 
 def server(input, output, session):
-    # Loading file
     @reactive.Calc
     def get_data():
+        # Loading the file
         infile = Path(__file__).parent / "deaths_years_places.csv"
         df = pandas.read_csv(infile)
         return df
@@ -27,21 +27,20 @@ def server(input, output, session):
         # Getting the data
         deaths = pandas.DataFrame( get_data())
         
-        # Choosingthe data to be displayed
+        # Choosing the data to be displayed
         areas_to_keep = input.which_area()
         year_to_keep = input.which_year() 
         
         # Filtering the data
-        print('Type:', type(areas_to_keep))
         local_deaths = deaths[ (deaths['HBName'].isin(areas_to_keep)) &\
                                 (deaths['Year'] == year_to_keep ) ].copy()
-        local_deaths.drop(columns=['Year'], inplace = True)
+        local_deaths.drop(columns=['Year'], inplace=True)
         
         # Grouping and cleaning up
-        grouped = local_deaths.groupby(by="InjuryType").sum( numeric_only = True)
+        grouped = local_deaths.groupby(by="InjuryType").sum(numeric_only=True)
         grouped = grouped.sort_values(by="NumberofDeaths", ascending=False)
         
-        # Vizualizing
+        # Visualizing
         plt.xticks(rotation='vertical')
         plt.ylim(0, 300)
         bar_colors = ['red' if (cause == 'Poisoning') else 'grey'
@@ -61,9 +60,8 @@ def server(input, output, session):
     def some_table():
         deaths = pandas.DataFrame( get_data() )
         
-        # Choosingthe data to be displayed
+        # Choosing the data to be displayed
         areas_to_keep = input.which_area()
-        year_to_keep = input.which_year() 
         
         # Filtering the data
         local_deaths = deaths[deaths['HBName'].isin(areas_to_keep)].copy()
@@ -71,6 +69,6 @@ def server(input, output, session):
                                   values = ['NumberofDeaths'], 
                                   columns=['Year'],
                                   index=['HBName', 'InjuryType'],
-                                 aggfunc=sum).reset_index()
+                                  aggfunc=sum).reset_index()
 
 app = App(app_ui, server)
