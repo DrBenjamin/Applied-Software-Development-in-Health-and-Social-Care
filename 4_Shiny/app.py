@@ -1,6 +1,6 @@
 import pandas
-import io
 from shiny import App, render, ui, reactive
+from shiny.types import ImgData
 from pathlib import Path
 from matplotlib import pyplot as plt
 from PIL import Image
@@ -26,33 +26,7 @@ def server(input, output, session):
         infile = Path(__file__).parent / "deaths_years_places.csv"
         df = pandas.read_csv(infile)
         return df
-    
-    def create_map():
-        # Creating the map
-        #areas_list = input.which_area()
-        areas_list = ['NHS Ayreshire and Arran', 'NHS Borders', "NHS Dumfries and Galloway"]
-        image = 'Maps/Map.png'
-        file = here / image
-        img = Image.open(file)
-        map = Image.new("RGB", img.size, (255, 255, 255))
-        map.paste(img, box=(0, 0), mask=img.split()[3]) # 3 is the alpha channel
-        print('Areas: ', areas_list)
-        for area in areas_list:
-            image = 'Maps/' + nhs_areas[nhs_areas.index(area)].replace(" ", "_") + '.png'
-            file = here / image
-            img_overlay = Image.open(file)
-            img_overlay.load()  # required for png.split()
-            map.paste(img_overlay, box=(0, 0), mask=img.split()[3]) # 3 is the alpha channel
-        buffer = io.BytesIO()
-        #map.save(buffer, format="PNG")
-        map.save("Map_overlay.png")
-        print(len(buffer.getvalue()))
-        #img.save(buffer, format="PNG")
-        img.save("Map.png")
-        print(len(buffer.getvalue()))
-        #img = {"src": buffer.getvalue(), "width": "100px"}
-        #return img
-      
+
     @output
     @render.plot
     def show_graph():
@@ -87,10 +61,26 @@ def server(input, output, session):
           return None
         
     # Visualizing the areas
-    @render.image
+    @render.image(delete_file=False)
     def show_image():
-        #img = {"src": here / "Map.png", "width": "100px"}
-        return create_map()
+        # Creating the map
+        areas_list = input.which_area()
+        image = 'Maps/Map.png'
+        file = here / image
+        img = Image.open(file)
+        map = Image.new("RGB", img.size, (255, 255, 255))
+        map.paste(img, box=(0, 0), mask=img.split()[3]) # 3 is the alpha channel
+        for area in areas_list:
+            image = 'Maps/' + nhs_areas[nhs_areas.index(area)].replace(" ", "_") + '.png'
+            file = here / image
+            img_overlay = Image.open(file)
+            img_overlay.load()  # required for png.split()
+            map.paste(img_overlay, box=(0, 0), mask=img_overlay.split()[3]) # 3 is the alpha channel
+        image = "Maps/Map_.png"
+        file = here / image
+        map.save(file)
+        img: ImgData = {"src": str(file), "width": "100%"}
+        return img
         
     # Showing a table
     @output
