@@ -107,7 +107,7 @@ def server(input, output, session):
         img = Image.open(file)
         img.load() # required for png.split()
         map = Image.new("RGBA", img.size, (255, 255, 255))
-        map.paste(img, box=(0, 0), mask=img.split()[3]) # 3 is the alpha channel
+        map.paste(img, box=(0, 0))
         for area in areas_list:
             image = 'Maps/' + nhs_areas[nhs_areas.index(area)].replace(" ", "_") + '.png'
             file = here / image
