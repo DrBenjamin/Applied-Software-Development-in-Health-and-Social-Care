@@ -10,42 +10,55 @@ nhs_areas = ["NHS Ayrshire and Arran", "NHS Borders", "NHS Dumfries and Galloway
 
 app_ui = ui.page_navbar([
     ui.nav_panel("Area", [
-                 ui.h6("NHS areas"),
-                 ui.card([
-                    ui.layout_column_wrap(
-                        ui.card(ui.input_selectize("which_area", "Select Area(s)", choices=nhs_areas, multiple=True),),
-                        ui.card(ui.output_image("show_image", width="100%"),),),
-                    ]),
+                 ui.h5("NHS areas"),
+                 ui.layout_sidebar(
+                    ui.sidebar(
+                        ui.input_selectize("which_area", "Select Area(s)", choices=nhs_areas, multiple=True)
+                    ),
+                    ui.card(
+                        ui.output_image("show_image", width="100%")
+                    ),
+                 ),
                  ]),
     ui.nav_panel("Time", [
-                 ui.h6("Year"),
-                 ui.card([
-                    ui.layout_column_wrap(
-                        ui.card(ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep="", width="100%"),),
-                        ui.card("Text"),),
-                    ]),  
-                 ]),  
+                 ui.h5("Year"),
+                 ui.layout_sidebar(
+                    ui.sidebar(
+                        ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep="", width="100%"),
+                    ),
+                    ui.card(
+                        ui.markdown("Summary"),
+                        ui.output_text("show_year"),
+                    ),
+                 ),
+                 ]),
     ui.nav_panel("Graph", [
-                 ui.h6("Graph of Deaths by cause"),
+                 ui.h5("Graph of Deaths by cause"),
                  ui.card([
                     ui.output_plot("show_graph", width="100%"),
                  ]),
                  ]),
     ui.nav_panel("Table", [
-                 ui.h6("Table of Deaths by cause"),
+                 ui.h5("Table of Deaths by cause"),
                  ui.card([
                     ui.output_table("show_table", width="100%"),
                  ]),
                  ]),
     ui.nav_panel("Settings", [
-                 ui.h6("Settings"),
+                 ui.h5("Settings"),
                  ui.card([
                     ui.markdown("Choose the mode"),
                     ui.input_dark_mode(id="mode"),
-                    ui.markdown("Choose the theme"),
                  ]),
                  ]),
     ],
+    ui.nav_panel("About", [
+                 ui.h5("About"),
+                 ui.card([
+                    ui.markdown("B248593"),
+                    ui.markdown("Applied Software Development in Health and Social Care"),
+                 ]),
+                 ]),
     title="Scottish Deaths Analysis",  
     id="page",
 )
@@ -58,6 +71,23 @@ def server(input, output, session):
         df = pandas.read_csv(infile)
         return df
 
+    @render.text
+    def show_year():
+        # Getting the data
+        deaths = pandas.DataFrame( get_data())
+        
+        # Choosing the data to be displayed
+        areas_to_keep = input.which_area()
+        year_to_keep = input.which_year() 
+        
+        # Filtering the data
+        local_deaths = deaths[(deaths['HBName'].isin(areas_to_keep)) &\
+                                (deaths['Year'] == year_to_keep )].copy()
+        local_deaths.drop(columns=['Year'], inplace=True)
+        
+        # Calculating the total deaths
+        return f'Total deaths: {local_deaths['NumberofDeaths'].sum()}'
+      
     @output
     @render.plot
     def show_graph():
