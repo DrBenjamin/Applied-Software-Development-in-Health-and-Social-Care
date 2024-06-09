@@ -6,31 +6,50 @@ from matplotlib import pyplot as plt
 from PIL import Image
 from pathlib import Path
 here = Path(__file__).parent
-nhs_areas = ["NHS Ayreshire and Arran", "NHS Borders", "NHS Dumfries and Galloway", "NHS Fife", "NHS Forth Valley", "NHS Grampian", "NHS Greater Glasgow and Clyde", "NHS Highland", "NHS Lanarkshire", "NHS Lothian", "NHS Orkney", "NHS Shetland", "NHS Tayside", "NHS Western Isles"]
+nhs_areas = ["NHS Ayrshire and Arran", "NHS Borders", "NHS Dumfries and Galloway", "NHS Fife", "NHS Forth Valley", "NHS Grampian", "NHS Greater Glasgow and Clyde", "NHS Highland", "NHS Lanarkshire", "NHS Lothian", "NHS Orkney", "NHS Shetland", "NHS Tayside", "NHS Western Isles"]
 
-app_ui = ui.page_navbar(
+app_ui = ui.page_navbar([
     ui.nav_panel("Area", [
-                 ui.h5("NHS areas"),
-                 ui.input_selectize("which_area", "Select Area(s)", choices=nhs_areas, multiple=True),
-                 ui.output_image("show_image", height="100%"),
+                 ui.h6("NHS areas"),
+                 ui.layout_column_wrap(
+                    ui.card(ui.input_selectize("which_area", "Select Area(s)", choices=nhs_areas, multiple=True),),
+                    ui.card(ui.output_image("show_image", width="100%"),),),
               ]),
     ui.nav_panel("Time", [
-                  ui.h5("Year"),
-                  ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep="", width="100%"),
+                 ui.h6("Year"),
+                 ui.layout_column_wrap(
+                    ui.card(ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep="", width="100%"),),
+                    ui.card("Text"),),
               ]),  
     ui.nav_panel("Graph", [
-                  ui.h5("Graph of Deaths by cause"),
-                  ui.output_plot("show_graph", width="100%"),
+                 ui.h6("Graph of Deaths by cause"),
+                 ui.output_plot("show_graph", width="100%"),
               ]),
     ui.nav_panel("Table", [
-                  ui.h5("Table of Deaths by cause"),
-                  ui.output_table("show_table", width="100%"),
-    ]),
+                 ui.h6("Table of Deaths by cause"),
+                 ui.output_table("show_table", width="100%"),
+              ]),
+    ui.nav_panel("Settings", [
+                 ui.h6("Settings"),
+                 ui.input_dark_mode(id="mode"),
+
+              ]),
+    ],
     title="Scottish Deaths Analysis",  
     id="page",
 )
 
 def server(input, output, session):
+    @reactive.effect
+    @reactive.event(input.make_light)
+    def _():
+        ui.update_dark_mode("light")
+
+    @reactive.effect
+    @reactive.event(input.make_dark)
+    def _():
+        ui.update_dark_mode("dark")
+        
     @reactive.Calc
     def get_data():
         # Loading the file
