@@ -11,45 +11,46 @@ nhs_areas = ["NHS Ayrshire and Arran", "NHS Borders", "NHS Dumfries and Galloway
 app_ui = ui.page_navbar([
     ui.nav_panel("Area", [
                  ui.h6("NHS areas"),
-                 ui.layout_column_wrap(
-                    ui.card(ui.input_selectize("which_area", "Select Area(s)", choices=nhs_areas, multiple=True),),
-                    ui.card(ui.output_image("show_image", width="100%"),),),
-              ]),
+                 ui.card([
+                    ui.layout_column_wrap(
+                        ui.card(ui.input_selectize("which_area", "Select Area(s)", choices=nhs_areas, multiple=True),),
+                        ui.card(ui.output_image("show_image", width="100%"),),),
+                    ]),
+                 ]),
     ui.nav_panel("Time", [
                  ui.h6("Year"),
-                 ui.layout_column_wrap(
-                    ui.card(ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep="", width="100%"),),
-                    ui.card("Text"),),
-              ]),  
+                 ui.card([
+                    ui.layout_column_wrap(
+                        ui.card(ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep="", width="100%"),),
+                        ui.card("Text"),),
+                    ]),  
+                 ]),  
     ui.nav_panel("Graph", [
                  ui.h6("Graph of Deaths by cause"),
-                 ui.output_plot("show_graph", width="100%"),
-              ]),
+                 ui.card([
+                    ui.output_plot("show_graph", width="100%"),
+                 ]),
+                 ]),
     ui.nav_panel("Table", [
                  ui.h6("Table of Deaths by cause"),
-                 ui.output_table("show_table", width="100%"),
-              ]),
+                 ui.card([
+                    ui.output_table("show_table", width="100%"),
+                 ]),
+                 ]),
     ui.nav_panel("Settings", [
                  ui.h6("Settings"),
-                 ui.input_dark_mode(id="mode"),
-
-              ]),
+                 ui.card([
+                    ui.markdown("Choose the mode"),
+                    ui.input_dark_mode(id="mode"),
+                    ui.markdown("Choose the theme"),
+                 ]),
+                 ]),
     ],
     title="Scottish Deaths Analysis",  
     id="page",
 )
 
 def server(input, output, session):
-    @reactive.effect
-    @reactive.event(input.make_light)
-    def _():
-        ui.update_dark_mode("light")
-
-    @reactive.effect
-    @reactive.event(input.make_dark)
-    def _():
-        ui.update_dark_mode("dark")
-        
     @reactive.Calc
     def get_data():
         # Loading the file
