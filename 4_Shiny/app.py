@@ -108,6 +108,10 @@ def server(input, output, session):
         grouped = grouped.sort_values(by="NumberofDeaths", ascending=False)
         
         # Visualizing
+        areas = [
+                        area.replace("NHS ", "")
+                        for area in areas_to_keep
+                      ]
         plt.xticks(rotation='vertical')
         plt.ylim(0, 300)
         bar_colors = [
@@ -115,7 +119,7 @@ def server(input, output, session):
                                  for cause in grouped.index 
                                 ]
 
-        plt.title(f"Deaths around {', '.join(areas_to_keep)} in year {year_to_keep}")         
+        plt.title(f"Deaths for {', '.join(areas)} in year {year_to_keep}")         
         plt.xlabel("Death Causes")
         plt.ylabel("Deaths Count")
         plt.rcParams.update({
@@ -136,14 +140,12 @@ def server(input, output, session):
         image = 'Maps/Map.png'
         file = here / image
         img = Image.open(file)
-        img.load() # required for png.split()
         map = Image.new("RGBA", img.size, (255, 255, 255))
         map.paste(img, box=(0, 0))
         for area in areas_list:
             image = 'Maps/' + nhs_areas[nhs_areas.index(area)].replace(" ", "_") + '.png'
             file = here / image
             img_overlay = Image.open(file)
-            img_overlay.load() # required for png.split()
             map.paste(img_overlay, box=(0, 0), mask=img_overlay.split()[3]) # 3 is the alpha channel
         image = "Maps/Map_.png"
         file = here / image
