@@ -4,15 +4,11 @@
 # 2. from a file included in shiny interface
 # 3. from url - this one is hardest, since it includes 
 # a need for 'waiting' for the result (using async)
-
 import pandas as pd
 from io import StringIO
 from pathlib import Path
 import pyodide.http # this is needed for async url fetching
-
-
 from shiny import App, render, ui
-
 import pandas as pd
 from io import StringIO
 
@@ -83,7 +79,6 @@ def server(input, output, session):
         # is 'alowed' to take time (async) and we are fine with (a)waiting for it
         print("done")
         return loaded_df
-
 
 # This is a shiny.App object. It must be named `app`.
 app = App(app_ui, server)

@@ -1,4 +1,5 @@
-import pandas
+import pandas as pd
+import numpy as np
 from shiny import App, render, ui, reactive
 from shiny.types import ImgData
 from pathlib import Path
@@ -24,7 +25,7 @@ app_ui = ui.page_navbar([
                  ui.h5("Year"),
                  ui.layout_sidebar(
                     ui.sidebar(
-                        ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=2012, step=1, sep="", width="100%"),
+                        ui.input_slider("which_year", "Select Year", min=2012, max=2021, value=(2012, 2021), step=1, sep="", width="100%"),
                     ),
                     ui.card(
                         ui.markdown("Summary"),
@@ -68,7 +69,7 @@ def server(input, output, session):
     def get_data():
         # Loading the file
         infile = Path(__file__).parent / "deaths_years_places.csv"
-        df = pandas.read_csv(infile)
+        df = pd.read_csv(infile)
         return df
       
     # Visualizing the areas
@@ -95,15 +96,16 @@ def server(input, output, session):
     @render.text
     def show_year():
         # Getting the data
-        deaths = pandas.DataFrame( get_data())
+        deaths = pd.DataFrame( get_data())
         
         # Choosing the data to be displayed
         areas_to_keep = input.which_area()
-        year_to_keep = input.which_year() 
-        
+        year_to_keep = input.which_year()
+        year_to_keep = np.arange(year_to_keep[0], year_to_keep[1] + 1)
+                
         # Filtering the data
         local_deaths = deaths[(deaths['HBName'].isin(areas_to_keep)) &\
-                                (deaths['Year'] == year_to_keep )].copy()
+                                (deaths['Year'].isin(year_to_keep))].copy()
         local_deaths.drop(columns=['Year'], inplace=True)
         
         # Calculating the total deaths
@@ -113,15 +115,16 @@ def server(input, output, session):
     @render.plot
     def show_graph():
         # Getting the data
-        deaths = pandas.DataFrame( get_data())
+        deaths = pd.DataFrame( get_data())
         
         # Choosing the data to be displayed
         areas_to_keep = input.which_area()
         year_to_keep = input.which_year() 
+        year_to_keep = np.arange(year_to_keep[0], year_to_keep[1] + 1)
         
         # Filtering the data
         local_deaths = deaths[(deaths['HBName'].isin(areas_to_keep)) &\
-                                (deaths['Year'] == year_to_keep )].copy()
+                                (deaths['Year'].isin(year_to_keep))].copy()
         local_deaths.drop(columns=['Year'], inplace=True)
         
         # Grouping and cleaning up
@@ -145,7 +148,7 @@ def server(input, output, session):
                                  for cause in grouped.index 
                                 ]
 
-        plt.title(f"Deaths for {', '.join(areas)} in year {year_to_keep}")         
+        plt.title(f'Deaths for {", ".join(areas)} in year(s) {str(", ".join(map(str, year_to_keep)))}')         
         plt.xlabel("Death Causes")
         plt.ylabel("Deaths Count")
         if len(local_deaths) > 0:
@@ -157,14 +160,14 @@ def server(input, output, session):
     @output
     @render.table
     def show_table():
-        deaths = pandas.DataFrame(get_data())
+        deaths = pd.DataFrame(get_data())
         
         # Choosing the data to be displayed
         areas_to_keep = input.which_area()
         
         # Filtering the data
         local_deaths = deaths[deaths['HBName'].isin(areas_to_keep)].copy()
-        return pandas.pivot_table(local_deaths, 
+        return pd.pivot_table(local_deaths, 
                                   values = ['NumberofDeaths'], 
                                   columns=['Year'],
                                   index=['HBName', 'InjuryType'],

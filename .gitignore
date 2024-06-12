@@ -6,3 +6,4 @@
 __pycache__/*
 4_Shiny/__pycache__/app.cpython-312.pyc
 4_Shiny/Maps/Map_.png
+.DS_Store
