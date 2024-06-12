@@ -2,3 +2,5 @@ jupyter
 shiny
 shinywidgets
 shinyswatch
+pyodide.http
+pyodide-py
